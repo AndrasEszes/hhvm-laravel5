@@ -1,7 +1,7 @@
 server {
     listen 80;
-    server_name {{servername}} {{serverip}};
-    root /var/www/{{servername}}/public;
+    server_name {{fqdn}} {{hostname}} {{ip}};
+    root /var/www/{{fqdn}}/public;
 
     index index.html index.htm index.php;
 
@@ -15,7 +15,7 @@ server {
     location = /robots.txt  { access_log off; log_not_found off; }
 
     access_log off;
-    error_log /var/log/nginx/{{servername}}.error.log error;
+    error_log /var/log/nginx/{{fqdn}}.error.log error;
 
     sendfile off;
     client_max_body_size 100m;
