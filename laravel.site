@@ -1,0 +1,55 @@
+server {
+	listen 80;
+	server_name {{servername}} {{serverip}};
+	root /var/www/{{servername}}/public;
+
+	index index.html index.htm index.php;
+
+	charset utf-8;
+
+	location / {
+		try_files $uri $uri/ /index.php?$query_string;
+	}
+
+	location = /favicon.ico { access_log off; log_not_found off; }
+	location = /robots.txt  { access_log off; log_not_found off; }
+
+	access_log						off;
+	error_log						/var/log/nginx/{{servername}}.error.log error;
+	sendfile						off;
+	client_max_body_size			100m;
+
+	location ~ \.(hh|php)$ {
+		try_files					$uri =404;
+		proxy_intercept_errors		on;
+		error_page					502 = @fallback;
+		fastcgi_split_path_info		^(.+\.php)(/.+)$;
+		fastcgi_intercept_errors	off;
+		fastcgi_buffer_size			16k;
+		fastcgi_buffers				4 16k;
+		fastcgi_keep_conn			on;
+		fastcgi_index				index.php;
+		fastcgi_param				SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_param				SERVER_NAME $host;
+		fastcgi_pass				127.0.0.1:9000;
+		include						fastcgi_params;
+	}
+
+	location @fallback {
+		try_files 					$uri =404;
+		fastcgi_split_path_info		^(.+\.php)(/.+)$;
+		fastcgi_intercept_errors	off;
+		fastcgi_buffer_size			16k;
+		fastcgi_buffers				4 16k;
+		fastcgi_keep_conn			on;
+		fastcgi_index				index.php;
+		fastcgi_param				SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_param				SERVER_NAME $host;
+		fastcgi_pass				unix:/var/run/php5-fpm.sock;
+		include						fastcgi_params;
+	}
+
+	location ~ /\.ht {
+		deny all;
+	}
+}
