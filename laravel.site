@@ -1,7 +1,7 @@
 server {
     listen 80;
     server_name {{fqdn}} {{hostname}} {{ip}};
-    root /var/www/{{fqdn}}/public;
+    root /home/{{user}}/www/{{fqdn}}/public;
 
     index index.html index.htm index.php;
 
